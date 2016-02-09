@@ -1,0 +1,29 @@
+{
+  "name": "Erza",
+  "description": "A wiki frontend for simple text files",
+  "version": "0.0.0",
+  "private": false,
+  "author": "Andrew London",
+  "homepage": "",
+  "contributors": [
+    "Andrew London <andrew@diluvian.net> (https://github.com/kenjura)"
+  ],
+  "bugs": {
+    "url": ""
+  },
+  "dependencies": {
+    "express": "^4.13.4",
+    "fs": "0.0.2",
+    "fs-extra": "^0.26.5",
+    "underscore": "^1.8.3"
+  },
+  "devDependencies": {},
+  "keywords": [],
+  "repository": "",
+  "licenses": [
+    {
+      "type": "MIT",
+      "url": "http://opensource.org/licenses/MIT"
+    }
+  ]
+}

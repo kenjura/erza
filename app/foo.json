@@ -1,0 +1,70 @@
+{
+    "path": "/Users/andrew/Dropbox/Dev/github/narrwiki_test/wiki",
+    "name": "wiki",
+    "type": "folder",
+    "children": [
+        {
+            "path": "/Users/andrew/Dropbox/Dev/github/narrwiki_test/wiki/.DS_Store",
+            "name": ".DS_Store",
+            "type": "file"
+        },
+        {
+            "path": "/Users/andrew/Dropbox/Dev/github/narrwiki_test/wiki/folder1",
+            "name": "folder1",
+            "type": "folder",
+            "children": [
+                {
+                    "path": "/Users/andrew/Dropbox/Dev/github/narrwiki_test/wiki/folder1/.DS_Store",
+                    "name": ".DS_Store",
+                    "type": "file"
+                },
+                {
+                    "path": "/Users/andrew/Dropbox/Dev/github/narrwiki_test/wiki/folder1/folder1a",
+                    "name": "folder1a",
+                    "type": "folder",
+                    "children": [
+                        {
+                            "path": "/Users/andrew/Dropbox/Dev/github/narrwiki_test/wiki/folder1/folder1a/page1a_a.txt",
+                            "name": "page1a_a.txt",
+                            "type": "file"
+                        }
+                    ]
+                },
+                {
+                    "path": "/Users/andrew/Dropbox/Dev/github/narrwiki_test/wiki/folder1/page1a.txt",
+                    "name": "page1a.txt",
+                    "type": "file"
+                }
+            ]
+        },
+        {
+            "path": "/Users/andrew/Dropbox/Dev/github/narrwiki_test/wiki/folder2",
+            "name": "folder2",
+            "type": "folder",
+            "children": [
+                {
+                    "path": "/Users/andrew/Dropbox/Dev/github/narrwiki_test/wiki/folder2/pageA.txt",
+                    "name": "pageA.txt",
+                    "type": "file"
+                }
+            ]
+        },
+        {
+            "path": "/Users/andrew/Dropbox/Dev/github/narrwiki_test/wiki/folder3",
+            "name": "folder3",
+            "type": "folder",
+            "children": [
+                {
+                    "path": "/Users/andrew/Dropbox/Dev/github/narrwiki_test/wiki/folder3/pageA.txt",
+                    "name": "pageA.txt",
+                    "type": "file"
+                }
+            ]
+        },
+        {
+            "path": "/Users/andrew/Dropbox/Dev/github/narrwiki_test/wiki/home.txt",
+            "name": "home.txt",
+            "type": "file"
+        }
+    ]
+}
