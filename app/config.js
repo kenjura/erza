@@ -1,4 +1,6 @@
+var cfg = require('/etc/erza.json');
+
 module.exports = {
 	linkbase: '/article/',
-	wikiroot: '/Users/andrew/Dropbox/RPG Root/RPG/wiki/'
+	wikiroot: cfg.wikiroot
 }

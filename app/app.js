@@ -35,16 +35,16 @@ app.get(/\/(.*)/, function (req, res) {
 
 function getArticle(db,articleName,req,res) {
 	// get menu
-	var menuHtml = article.get(db,'_menu');
+	var menuHtml = article.get(db,'_menu').html;
 
 	// get style
 	var styleCss = article.getWikitext(db,'_style');
 
 	// get article
-	var articleHtml = article.get(db,articleName.toLowerCase());
+	var articleObj = article.get(db,articleName.toLowerCase());
 
 	// render
-	res.render('index', { title: getTitle(articleName), content: articleHtml, menuHtml:menuHtml, styleCss:styleCss });
+	res.render('index', { title: getTitle(articleName), content: articleObj.html, sidebarHtml: articleObj.sidebarHtml, menuHtml:menuHtml, styleCss:styleCss });
 
 
 	function getTitle(articleName) {

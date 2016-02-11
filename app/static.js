@@ -17,6 +17,7 @@ exports.get = function(filename,req,res) {
 
 	if (extension=='js') res.header("Content-Type", "text/javascript");
 	if (extension=='html') res.header("Content-Type", "text/html");
+	if (extension=='css') res.header("Content-Type", "text/css");
 	res.status(200).send(filecontents);
 }
 

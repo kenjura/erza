@@ -3,164 +3,7 @@
 <head>
 	<meta charset="utf-8">
 	<title>{{title}}</title>
-	<!-- <link rel="stylesheet" href="css/style.css"> -->
-	<style>
-		html { font-family: sans-serif; }
-		body {
-			background-color: #EEE8DD;
-			color: #444;
-			margin: 0;
-			padding: 0;
-		}
-
-		a, .link { 
-			color: blue;
-			cursor: pointer;
-			text-decoration: none;
-		}
-		a:hover {
-			color: #33F;
-		}
-		.sectionOuter1 {
-			margin: 20px;
-    		padding: 20px;
-		}
-		.section {
-			background: white;
-    		padding: 20px;
-		}
-		#menu {
-			background-color: #444;
-			color: #ccc;
-			width: 100%;
-			position: relative;
-			/*padding: 10px;*/
-			box-sizing: border-box;
-		}
-		#menu ul {
-		    display: block;
-		    margin: 0;
-		    padding: 0;
-		}
-		#menu li {
-			cursor: pointer;
-		    display: inline-block;
-		    list-style: none;
-		    position: relative;
-		    /*padding: 10px;*/
-		}
-		#menu > ul > li {
-		    vertical-align: top;
-		}
-		#menu ul ul li {
-		    box-sizing: border-box;
-		    width: 100%;
-		}
-		#menu > ul > li ul {
-		    display: none;
-		    position: absolute;
-		    background: #444;
-		    /* left: 0; */
-		}
-		#menu li:hover > ul {
-		    display: block;
-		}
-		#menu ul ul ul {
-		    left: 100%;
-		    top: 0;
-		}
-		#menu li:hover {
-		    background: #555;
-		}
-		#menu a {
-			color: white;
-		}
-		#menu ul a {
-		    text-decoration: none;
-		    white-space: nowrap;
-		    padding: 11px 10px;
-		    display: inline-block;
-		}
-		#menu ul ul a {
-			padding: 5px 10px;
-		}
-		span.arrow {
-		    display: inline-block;
-		    border: 1px solid #888;
-		    width: 6px;
-		    height: 6px;
-		    border-width: 1px 1px 0 0;
-		    transform: rotate(45deg);
-		    margin-left: 10px;
-		    position: relative;
-		    top: -2px;
-		}
-		#menu > ul > li > a > span.arrow {
-		    display: none;
-		}
-
-		#content h1 {
-			text-transform: capitalize;
-		}
-
-
-		/**** IMAGES ****/
-		.wikiImage, .noImage {
-	display: inline-block;
-	cursor: pointer;	
-	-webkit-transition: box-shadow 0.3s;	
-	position: relative;
-	overflow: hidden;
-	max-width: 100%;
-	margin-bottom: -6px;
-}
-.wikiImage img {
-	width: 100%;
-}
-.wikiImage.center {
-	display: block;
-	text-align: center;
-}
-.wikiImage.center img {
-	width: auto;
-}
-.wikiImage {
-}
-.wikiImage_caption {
-	/*display: none;*/
-	position: absolute;
-	bottom: 0;
-	left: 0;
-	width: 100%;
-	max-height: 75%;
-	background: rgba(0,0,0,0.75);
-	color: white;
-	overflow: auto;
-	padding: 10px;
-	text-align: center;
-	box-sizing: border-box;
-	opacity: 0;
-	-webkit-transition: top 0.2s, opacity 0.2s;
-}
-.wikiImage:hover .wikiImage_caption {
-	opacity: 1;
-	/*-webkit-animation: fadeIn 0.3s ease-out;*/
-}
-@-webkit-keyframes fadeIn {
-	0% { opacity: 0; top: 100%; }
-	100% { opacity: 1; top: 60%; }
-}
-/**** END IMAGES ****/
-
-	#homeIcon {
-		position: absolute;
-	    top: 0;
-	    right: 10px;
-	    font-size: 20px;
-	    line-height: 40px;
-	    cursor: pointer;
-	}
-	</style>
+	<link rel="stylesheet" href="/static/main.css">
 	<style>
 	{{styleCss}}
 	</style>
@@ -175,7 +18,10 @@
 		<a href="/"><i id="homeIcon" class="fa fa-home"></i></a>
 	</div>
 
-	<div id="content">{{content}}</div>
+	<div id="content">
+		<div id="mainContent">{{content}}</div>
+		<div id="sidebarContent">{{sidebarHtml}}</div>
+	</div>
 
 	<script>
 	var stickyElements = document.querySelectorAll('#content .sectionOuter h1');
