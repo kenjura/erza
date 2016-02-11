@@ -3,6 +3,12 @@ var fs = require('fs');
 
 
 exports.get = function(filename,req,res) {
+	if (typeof(filename)!='string') {
+		console.error('Static.js > ERROR: filename is not a string. First 100 characters are:');
+		console.error(String(filename).substr(0,50));
+		res.status(400).send();
+		return;
+	}
 	console.log('Static.js > get > name=',filename);
 	console.log('DIRNAME',__dirname);
 
@@ -18,12 +24,20 @@ exports.get = function(filename,req,res) {
 	if (extension=='js') res.header("Content-Type", "text/javascript");
 	if (extension=='html') res.header("Content-Type", "text/html");
 	if (extension=='css') res.header("Content-Type", "text/css");
+	if (extension=='ico') res.header("Content-Type", "image/ico");
 	res.status(200).send(filecontents);
 }
 
 
 
 exports.getImage = function(db,filename,req,res) {
+	if (typeof(filename)!='string') {
+		console.error('Static.js > ERROR: filename is not a string. First 100 characters are:');
+		console.error(JSON.stringify(filename).substr(0,50));
+		res.status(400).send();
+		return;
+	}
+
 	console.log('Static.js > getImage > name=',filename);
 	console.log('DIRNAME',__dirname);
 

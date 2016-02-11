@@ -19,7 +19,20 @@ app.get(/\/static\/(.*)/, function (req,res) {
 	staticFile.get(req.params[0],req,res);
 });
 
+app.get('/search',function(req,res){
+	var q = req.query.q;
+	var db = req.query.db;
+	// console.log(req.query);
+	article.search(q,db,req,res);
+});
+
+app.get(/\/favicon.ico/, function(req,res){
+	console.log('getting favicon');
+	staticFile.get('favicon.ico',req,res);
+});
+
 app.get(/\/(.*)\/img\/(.*)/, function (req, res) {
+	console.log('getting image');
 	staticFile.getImage(req.params[0],req.params[1],req,res);
 });
 app.get(/\/(.*)\/(.*)/, function (req, res) {
@@ -42,13 +55,16 @@ function getArticle(db,articleName,req,res) {
 
 	// get article
 	var articleObj = article.get(db,articleName.toLowerCase());
+	var articleHtml = articleObj.html;
+	if (req.query.wikitext!==undefined) articleHtml = '<pre>' + articleObj.wikitext + '</pre>';
+	// res.status(200).send(JSON.stringify(req.query));
 
 	// render
-	res.render('index', { title: getTitle(articleName), content: articleObj.html, sidebarHtml: articleObj.sidebarHtml, menuHtml:menuHtml, styleCss:styleCss });
+	res.render('index', { title: getTitle(db,articleName), db:db, content: articleHtml, sidebarHtml: articleObj.sidebarHtml, menuHtml:menuHtml, styleCss:styleCss });
 
 
-	function getTitle(articleName) {
-		articleName = articleName.replace( /^_/ , '' );
+	function getTitle(db,articleName) {
+		return db + ': ' + articleName.replace( /^_/ , '' );
 	}
 }
 

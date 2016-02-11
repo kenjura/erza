@@ -156,7 +156,7 @@ exports.wikiToHtml = function(wikitext,articleName,args) {
 	// html = html.replace( />/g , '>\n' );
 	
 	// return html;
-	return { html:html, sidebarHtml:sidebarHtml };
+	return { html:html, sidebarHtml:sidebarHtml, wikitext:wikitext };
 
 	function processLink(entireMatch,articleName,displayName,anchor) {
 		var namespace = [].concat(articleName.match( /([^:]+)(?=:)/g )).pop();

@@ -15,7 +15,18 @@
 
 	<div id="menu">
 		{{menuHtml}}
-		<a href="/"><i id="homeIcon" class="fa fa-home"></i></a>
+		<div class="menuIcons">
+			<div class="menuIcon menuIcon_search">
+				<i class="fa fa-search"></i>
+				<div class="search">
+					<form action="/search">
+						<input name="q">
+						<input type="hidden" name="db" value="{{db}}">
+					</form>
+				</div>
+			</div>
+			<div class="menuIcon"><a href="/"><i class="fa fa-home"></i></a></div>
+		</div>
 	</div>
 
 	<div id="content">

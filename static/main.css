@@ -34,6 +34,7 @@ div#mainContent, div#sidebarContent {
 
 div#content {
     display: table;
+    padding-top: 40px;
     width: 100%;
     box-sizing: border-box;
 }
@@ -46,7 +47,7 @@ div#content {
 	background-color: #444;
 	color: #ccc;
 	width: 100%;
-	position: relative;
+	position: fixed;
 	/*padding: 10px;*/
 	box-sizing: border-box;
 }
@@ -165,11 +166,53 @@ span.arrow {
 }
 /**** END IMAGES ****/
 
-#homeIcon {
+.menuIcons {
 	position: absolute;
     top: 0;
     right: 10px;
     font-size: 20px;
     line-height: 40px;
-    cursor: pointer;
 }
+.menuIcon {
+	color: white;
+	cursor: pointer;
+	display: inline-block;
+	padding: 0 10px;
+	margin: 0;
+	margin-left: -4px;
+}
+.menuIcon:hover {
+	background: #555;
+}
+.menuIcon_search:hover .search {
+	display: block;
+}
+.search {
+	display: none;
+	position: absolute;
+	top: 40px;
+	right: -10px;
+	padding: 10px;
+	background: #555;
+}
+.search input {
+	font-size: 0.7em;
+	margin: 0;
+	padding: 5px;
+}
+
+
+
+
+
+
+.grid2, .grid3 {
+	box-sizing: border-box;
+	display: inline-block;
+	margin-right: 10px;
+	vertical-align: top;
+}
+.grid2:last-child, .grid3:last-child { margin-right: 0; }
+.grid2 { width: calc(50% - 7px); margin-right: 10px; }
+.grid3 { width: calc(33.33% - 9px); }
+
