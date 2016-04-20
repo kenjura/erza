@@ -15,9 +15,12 @@
     "express": "^4.13.4",
     "fs": "0.0.2",
     "fs-extra": "^0.26.5",
-    "underscore": "^1.8.3"
+    "underscore": "^1.8.3",
+    "upath": "^0.1.7"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "supervisor": "^0.10.0"
+  },
   "keywords": [],
   "repository": "",
   "licenses": [

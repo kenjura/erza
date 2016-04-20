@@ -1,6 +1,9 @@
-html { font-family: sans-serif; }
+@import url(https://fonts.googleapis.com/css?family=Roboto:400,300,300italic,400italic,500,500italic,700,700italic);
+
+
+html { font-family: 'Roboto',sans-serif; }
 body {
-	background-color: #EEE8DD;
+	background-color: white;
 	color: #444;
 	margin: 0;
 	padding: 0;
@@ -15,21 +18,65 @@ a:hover {
 	color: #33F;
 }
 .sectionOuter1 {
-	margin: 20px;
+	/*margin: 20px;*/
 	padding: 20px;
 }
 .section {
-	background: white;
-	padding: 20px;
+	/*background: white;*/
+	/*padding: 20px;*/
+}
+div.tableContainer {
+	width: 100%;
+    overflow: auto;
+    /*background: rgba(0,0,0,0.07);*/
 }
 
-div#mainContent, div#sidebarContent {
-    display: table-cell;
-    vertical-align: top;
+div.tableContainer table { border-collapse: collapse }
+div.tableContainer table td { margin:0; padding: 5px 10px; }
+div.tableContainer table th { text-align: left; padding: 5px 10px; }
+div.tableContainer table tr:nth-child(odd) { background: rgba(0,0,0,0.05); }
+
+
+#topBar {
+	background-color: #444;
+	color: #ccc;
+	width: 100%;
+	position: fixed;
+	/*padding: 10px;*/
+	box-sizing: border-box;
+	position: fixed;
+	height: 40px;
+	z-index: 1000;
+	display: table;
+	table-layout: fixed;
 }
+#topBar a {
+	color: white;
+}
+
+#topBar .leftPane, #topBar .midPane, #topBar .rightPane {
+	display: table-cell;
+	vertical-align: top;
+}
+.leftPane {
+	width: 300px;
+}
+.midPane {
+	/*min-width: 700px;
+	max-width: 1000px;*/
+}
+.rightPane {
+	width: 300px;
+}
+#topBar .rightPane {
+	text-align: right;
+}
+
+
+
 
 #sidebarContent {
-    max-width: 270px;
+    /*max-width: 270px;*/
 }
 
 div#content {
@@ -39,17 +86,41 @@ div#content {
     box-sizing: border-box;
 }
 
+#leftContent {
+	position: fixed;
+	left: 0;
+	top: 40px;
+	width: 300px;
+	background: hsl(40,20%,90%);
+    box-shadow: inset -5px 0px 17px -7px rgba(0,0,0,0.5);
+    height: calc(100vh - 40px - 107px);
+    overflow: auto;
+}
+#sidebarContent {
+	position: fixed;
+	right: 0;
+	top: 40px;
+	width: 300px;
+	background: hsl(40,20%,90%);
+    box-shadow: inset 5px 0px 17px -7px rgba(0,0,0,0.5);
+    height: calc(100vh - 40px);
+    overflow: auto;
+}
+#mainContent {
+	width: calc(100% - 600px);
+    margin: auto;
+    min-height: calc(100vh - 40px);
+}
 
 
+#badge {
+	width: 300px;
+}
 
 
 #menu {
-	background-color: #444;
-	color: #ccc;
-	width: 100%;
-	position: fixed;
-	/*padding: 10px;*/
-	box-sizing: border-box;
+	white-space: nowrap;
+	/*overflow: hidden;*/
 }
 #menu ul {
     display: block;
@@ -69,6 +140,7 @@ div#content {
 #menu ul ul li {
     box-sizing: border-box;
     width: 100%;
+    display: block;
 }
 #menu > ul > li ul {
     display: none;
@@ -177,13 +249,6 @@ span.arrow {
 }
 /**** END IMAGES ****/
 
-.menuIcons {
-	position: absolute;
-    top: 0;
-    right: 10px;
-    font-size: 20px;
-    line-height: 40px;
-}
 .menuIcon {
 	color: white;
 	cursor: pointer;
@@ -191,6 +256,8 @@ span.arrow {
 	padding: 0 10px;
 	margin: 0;
 	margin-left: -4px;
+    font-size: 20px;
+    line-height: 40px;
 }
 .menuIcon:hover {
 	background: #555;
@@ -202,7 +269,7 @@ span.arrow {
 	display: none;
 	position: absolute;
 	top: 40px;
-	right: -10px;
+	left: 0px;
 	padding: 10px;
 	background: #555;
 }
@@ -227,3 +294,89 @@ span.arrow {
 .grid2 { width: calc(50% - 7px); margin-right: 10px; }
 .grid3 { width: calc(33.33% - 9px); }
 
+
+
+
+#toc {
+	width: 300px;
+}
+#toc h1 {
+    font-size: 20px;
+    text-align: center;
+    font-weight: 400;
+    line-height: 20px;
+    margin: 0;
+    padding: 10px 0;
+    color: #999;
+}
+#toc ul {
+    margin: 0;
+    padding: 0;
+}
+
+#toc li {
+	list-style: none;
+}
+#toc li a {
+    display: block;
+    margin: 0;
+    padding: 5px 20px;
+}
+#toc li a:hover {
+    background: rgba(0,0,0,0.1);
+}
+#toc li a {
+    color: #444;
+    font-weight: 500;
+}
+
+#toc li li {
+    padding-left: 20px;
+}
+#toc li li a {
+    font-weight: 400;
+}
+
+
+
+#admin {
+	position: fixed;
+	bottom: 0;
+	width: 300px;
+	left: 0;
+	padding: 10px 0;
+	background: rgba(0,0,0,0.4);
+}
+
+#admin a {
+	display: block;
+	padding: 5px 20px;
+	color: white;
+}
+#admin a:hover {
+	background: rgba(0,0,0,0.1);
+}
+
+
+
+.right {
+  float: right;
+  margin-left: 20px;
+  max-width: 40%;
+}
+
+#mainContent .sidebarSection {
+	display: none;
+}
+@media (max-width:1337px) {
+	#sidebarContent {
+		display: none;
+	}
+	#mainContent .sidebarSection {
+		display: block;
+	}
+	#mainContent {
+		width: calc(100vw - 317px);
+		margin: 0 0 0 300px;
+	}	
+}

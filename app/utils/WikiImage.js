@@ -59,21 +59,25 @@ exports.getImageTag = function(args) {
 		//return '<img class="wikiImage" src="'+imgUrl+'" style="'+style+'" '+events+' />';
 
 		var template = ''+
-		'<div class="wikiImage {class}" style="{style}" title="{caption}">'+
-			'<img src="{src}" {events} />'+
-			'<div class="wikiImage_caption">{caption}</div>'+
-		'</div>';
+		'<a href="{src}">'+
+			'<div class="wikiImage {class}" style="{style}" title="{caption}">'+
+				'<img src="{src}" {events} />'+
+				'<div class="wikiImage_caption">{caption}</div>'+
+			'</div>'+
+		'</a>';
 
 		var template2 = ''+
-		'<div class="wikiImage {class}" style="background: url(\'{src}\'); background-size: {fillMode}; {style}" {events}>'+
-			'<div class="wikiImage_caption">{caption}</div>'+
-		'</div>';
+		'<a href="{src}">'+
+			'<div class="wikiImage {class}" style="background: url(\'{src}\'); background-size: {fillMode}; {style}" {events}>'+
+				'<div class="wikiImage_caption">{caption}</div>'+
+			'</div>'+
+		'</a>';
 
 
 		var html = template;
 		if (fillMode) html = template2;
 
-		html = html.replace( '{src}' , imgUrl );
+		html = html.replace( /\{src\}/g , imgUrl );
 		html = html.replace( '{class}' , classes );
 		html = html.replace( '{style}' , style );
 		html = html.replace( '{events}' , events );

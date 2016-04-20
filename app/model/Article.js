@@ -1,6 +1,7 @@
 var config = require('../config.js');
 var fs = require('fs');
 var wikiUtil = require('../utils/WikiUtil.js');
+var upath = require('upath');
 
 exports.get = function(db,name,args){ return get('html',db,name,args) }
 exports.getHtml = function(db,name,args){ return get('html',db,name,args) }
@@ -8,7 +9,8 @@ exports.getWikitext = function(db,name,args){ return get('wikitext',db,name,args
 exports.search = function(q,db,req,res) { return search(q,db,req,res) }
 
 function get(which,db,name,args) {
-	console.log('Article.js > get > db=',db,', name=',name,', args=',args);
+	console.log('Article.js > get > db=',db,', name=',name,', args=',args, ', which=',which);
+	if (!args) args = {};
 
 	// trailing '.txt' is not necessary
 	if (name.match('.txt')) name = name.replace('.txt','');
@@ -19,21 +21,28 @@ function get(which,db,name,args) {
 	// home? if so, change path
 	if (name=='home') name = '_home';
 
+	// add extension, if needed
+	var addExt = name.substr(-5)!='.html';
+
 	// find full path
-	var path = config.wikiroot + db + '/' + name + '.txt';
+	var path = config.wikiroot + db + '/' + name + (addExt?'.txt':'');
+	path = upath.normalize(path);
+	console.log(path);
 
 	// get file contents
 	try { var filecontents = fs.readFileSync(path); } catch(e) { console.error(e) }
 	if (!filecontents) return 'Article not found.';
+	console.log('article was found. contents=',filecontents);
 
 	// return wikitext, maybe
 	var wikitext = filecontents.toString();
-	if (which=='wikitext') return wikitext;
+	if (which=='wikitext'||args.which=='wikitext') return wikitext;
 
 	// convert wikitext to html
 	var html = wikiUtil.wikiToHtml(wikitext,name,{db:db});
 	return html;
 }
+
 
 function search(q,db,req,res) {
 	console.log('Article.js > search > db=',db,', q=',q);

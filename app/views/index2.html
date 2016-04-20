@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>{{title}}</title>
+	<link rel="stylesheet" href="/static/main2.css">
+	<style id="customStyle">
+	{{styleCss}}
+	</style>
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
+	<script src="/static/smoothScroll.js"></script>
+	<script src="/static/stickyfill.js"></script>
+</head>
+
+<body>
+
+	<div id="topBar">
+		<div class="leftPane">
+			<!-- <div class="menuIcon"><a href="/"><i class="fa fa-bars"></i></a></div> -->
+			<div class="menuIcon"><a href="/"><i class="fa fa-home"></i></a></div>
+			<div class="menuIcon menuIcon_search">
+				<i class="fa fa-search"></i>
+				<div class="search">
+					<form action="/search">
+						<input name="q">
+						<input type="hidden" name="db" value="{{db}}">
+					</form>
+				</div>
+			</div>
+		</div>
+		<div id="menu" class="midPane">
+			<!-- <div class="menuIcon"><a href="/"><i class="fa fa-user"></i></a></div> -->
+			{{menuHtml}}
+		</div>
+		<div class="menuIcons rightPane">
+			
+			<div class="menuIcon" onclick="toggleStyle()"><i class="fa fa-eye"></i></div>
+			<div class="menuIcon"><i class="fa fa-user"></i></div>
+		</div>
+	</div>
+
+	<div id="content">
+		<div id="leftContent">
+			<div id="badge">{{badgeHtml}}</div>
+			<div id="leftTools">
+
+				
+				<div id="toc">
+					<h1>Contents</h1>
+					{{tocHtml}}
+				</div>
+			</div>
+		</div>
+		<div id="mainContent">{{content}}</div>
+		<div id="sidebarContent">{{sidebarHtml}}</div>
+
+		<div id="admin">
+			<div><a onclick="alert('sorry, not yet implemented')">edit this page</a></div>
+			<div><a onclick="alert('sorry, not yet implemented')">view edit history</a></div>
+			<div><a onclick="alert('what were you expecting?')">do other stuff</a></div>
+		</div>
+	</div>
+
+	<script>
+	var stickyElements = document.querySelectorAll('#content .sectionOuter h1');
+
+	for (var i = stickyElements.length - 1; i >= 0; i--) {
+	    Stickyfill.add(stickyElements[i]);
+	}
+	</script>
+	<script>
+	    smoothScroll.init({ offset:60 });
+	</script>
+	<script>
+		function toggleStyle() {
+			var s = document.getElementById('customStyle');
+			s.disabled = !s.disabled;
+		}
+	</script>
+
+</body>
+</html>

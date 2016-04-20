@@ -27,7 +27,7 @@ _.mixin({
 var linkbase,article;
 
 
-exports.wikiToHtml = function(wikitext,articleName,args) {
+function wikiToHtml(wikitext,articleName,args) {
 	if (!args) args = {};
 	if (!wikitext) return 'nothing to render';
 
@@ -107,38 +107,40 @@ exports.wikiToHtml = function(wikitext,articleName,args) {
 	//html = html.replace( /\$JSON_(\d*)\$/g , processJSONRestore );
 	
 	// WORKING CODE for sectioning h1 and h2
-	var find = /(?:<h1>)([^\|<]*)(?:\|([^<\|]*))?(?:\|([^<]*))?(?:<\/h1>)([\d\D]*?)(?=<h1|$)/g;
-	var replace = '\
-		<div class="sectionOuter sectionOuter1 $2" style="$3">\
-			<h1>$1</h1>\
-			<a name="$1"></a>\
-			<div class="section section1">\
-				$4\
-				<!--SECTION-END-->\
-				<!--<div style="clear: both;"></div>-->\
-			</div>\
-		</div>';
-	var sidebarHtml = '';
-	// html = html.replace( find , replace );
-	html = html.replace( find , function(em,title,args,style,body){ 
-		if (args=='right') {				
-			sidebarHtml += em.replace(find,replace); 
-			return '';
-		}
-		return em.replace(find,replace);
-	});
-
-	var find = /(?:<h2>)([^\|<]*)(?:\|([^<\|]*))?(?:\|([^<]*))?(?:<\/h2>)([\d\D]*?)(?=<h2|<\!--SECTION-END|$)/g;
-    	var replace = '\
-    		<div class="sectionOuter2 $2">\
-    			<h2>$1</h2>\
-				<a id="$1" name="$1"></a>\
-    			<div class="section2">\
-    				$4\
+	if (!args.noSection) {
+		var find = /(?:<h1>)([^\|<]*)(?:\|([^<\|]*))?(?:\|([^<]*))?(?:<\/h1>)([\d\D]*?)(?=<h1|$)/g;
+		var replace = '\
+			<div class="sectionOuter sectionOuter1 $2" style="$3">\
+				<h1>$1</h1>\
+				<a name="$1"></a>\
+				<div class="section section1">\
+					$4\
+					<!--SECTION-END-->\
 					<!--<div style="clear: both;"></div>-->\
-    			</div>\
-    		</div>';
-	html = html.replace( find , replace );
+				</div>\
+			</div>';
+		var sidebarHtml = '';
+		// html = html.replace( find , replace );
+		html = html.replace( find , function(em,title,args,style,body){ 
+			if (args=='right') {				
+				sidebarHtml += em.replace(find,'<div class="sidebarSection">$4</div>'); 
+				return em.replace(find,'<div class="right sidebarSection">$4</div>');
+			}
+			return em.replace(find,replace);
+		});
+
+		var find = /(?:<h2>)([^\|<]*)(?:\|([^<\|]*))?(?:\|([^<]*))?(?:<\/h2>)([\d\D]*?)(?=<h2|<\!--SECTION-END|$)/g;
+	    	var replace = '\
+	    		<div class="sectionOuter2 $2">\
+	    			<h2>$1</h2>\
+					<a id="$1" name="$1"></a>\
+	    			<div class="section2">\
+	    				$4\
+						<!--<div style="clear: both;"></div>-->\
+	    			</div>\
+	    		</div>';
+		html = html.replace( find , replace );
+	}
 
 	// adding IDs to headers for TOC seeks
 	var find = /(?:<h(\d)>)([^<]*)(?:<\/h\1>)/g;
@@ -149,14 +151,29 @@ exports.wikiToHtml = function(wikitext,articleName,args) {
 	});
 
 	
-	// EXPERIMENTAL SECTIONING
-	
-	
-	// wtf is this?
-	// html = html.replace( />/g , '>\n' );
+	// toc html
+	if (args.toc) return html;
+	var tocHtml = getTOC(wikitext);
 	
 	// return html;
-	return { html:html, sidebarHtml:sidebarHtml, wikitext:wikitext };
+	return { html:html, sidebarHtml:sidebarHtml, wikitext:wikitext, tocHtml:tocHtml };
+
+
+	function getTOC(wikitext) {
+		if (!wikitext) return '';
+		var headerRows = wikitext.match( /^=.*/mg );
+		if (!headerRows||!headerRows.length) return '';
+		headerRows = headerRows.filter(hr=>hr.indexOf('|right')<0);
+		var headers = headerRows.join('\n');
+		headers = headers.replace( /\[\[/g , '' );
+		headers = headers.replace( /\]\]/g , '' );
+		headers = headers.replace( /^===([^=|]*)(.*)$/mg , '*** $1' );
+		headers = headers.replace( /^==([^=|]*)(.*)$/mg , '** $1' );
+		headers = headers.replace( /^=([^=|]*)(.*)$/mg , '* $1' );
+		headers = headers.replace( /=([^=|]*)/g , '$1' );
+		headers = headers.replace( /\* (.*)$/mg , '* [[#$1]]' );
+		return wikiToHtml(headers,'toc',{toc:true, noSection:true, noH1:true});;
+	}
 
 	function processLink(entireMatch,articleName,displayName,anchor) {
 		var namespace = [].concat(articleName.match( /([^:]+)(?=:)/g )).pop();
@@ -164,7 +181,7 @@ exports.wikiToHtml = function(wikitext,articleName,args) {
 		if (res) return res;
 			
 		// if (isNullOrEmpty(articleName)) return '<a href="#'+anchor+'" onclick="instance.findHeader(\''+anchor+'\')">'+anchor+'</a>';
-		if (!articleName) return '<a ng-click="tocNav(\''+anchor.replace( /\s/g, '_' )+'\')">'+anchor+'</a>';
+		if (!articleName) return '<a data-scroll href="#'+anchor.replace( /\s/g, '_' )+'">'+anchor+'</a>';
 		
 		if (!displayName) displayName = anchor || articleName;
 		else if (displayName.substr(0,1)=='|') displayName = displayName.substr(1);
@@ -327,8 +344,8 @@ exports.wikiToHtml = function(wikitext,articleName,args) {
 		
 		
 		// ***************** FINAL ******************
-		entireMatch = entireMatch.replace( /¦TABLE¦([^¦]*)¦/g , "<table $1><tr>" );
-		entireMatch = entireMatch.replace( /¦END TABLE¦/g , "</tr></table>" );
+		entireMatch = entireMatch.replace( /¦TABLE¦([^¦]*)¦/g , "<div class=\"tableContainer\"><table $1><tr>" );
+		entireMatch = entireMatch.replace( /¦END TABLE¦/g , "</tr></table></div>" );
 		
 		entireMatch = entireMatch.replace( /¦ROW BOUNDARY¦/g , "</tr><tr>" );
 		
@@ -359,3 +376,5 @@ exports.wikiToHtml = function(wikitext,articleName,args) {
 	
 }
 
+
+exports.wikiToHtml = wikiToHtml;

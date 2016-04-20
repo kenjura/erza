@@ -48,9 +48,13 @@ function go() {
 	var query = connection.query('SELECT * FROM '+sourcedb+'.image');
 	query
 		.on('result',function(row){
-			var imagepath = fs.realpathSync(imageroot+'/'+row.path);
-			var newpath = path+'/img/'+row.name;
-			try { fs.copySync(imagepath,newpath); } catch(e) { console.error('Image error: ',e) }
+			try { 
+				var imagepath = fs.realpathSync(imageroot+'/'+row.path);
+				var newpath = path+'/img/'+row.name;
+				fs.copySync(imagepath,newpath); 
+			} catch(e) { 
+				console.error('Image error: ',e) 
+			}
 		});
 
 	// get all articles

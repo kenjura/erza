@@ -51,16 +51,23 @@ function getArticle(db,articleName,req,res) {
 	var menuHtml = article.get(db,'_menu').html;
 
 	// get style
-	var styleCss = article.getWikitext(db,'_style');
+	var styleCss = article.getWikitext(db,'_style2');
 
 	// get article
 	var articleObj = article.get(db,articleName.toLowerCase());
+	// var articleHtml = '<pre>'+articleObj.html.replace(/</g,'&lt;').replace(/>/g,'&gt;')+'</pre>';
 	var articleHtml = articleObj.html;
 	if (req.query.wikitext!==undefined) articleHtml = '<pre>' + articleObj.wikitext + '</pre>';
+	var tocHtml = articleObj.tocHtml;
 	// res.status(200).send(JSON.stringify(req.query));
 
+	// badge
+	var badgeHtml = article.getWikitext(db,'_badge.html');
+
+	// return res.status(200).send(articleObj);
+
 	// render
-	res.render('index', { title: getTitle(db,articleName), db:db, content: articleHtml, sidebarHtml: articleObj.sidebarHtml, menuHtml:menuHtml, styleCss:styleCss });
+	res.render('index2', { title: getTitle(db,articleName), db:db, content: articleHtml, sidebarHtml: articleObj.sidebarHtml, menuHtml:menuHtml, styleCss:styleCss, tocHtml:tocHtml, badgeHtml:badgeHtml });
 
 
 	function getTitle(db,articleName) {
