@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
 	<meta charset="utf-8">
+	<meta name="viewport" content="initial-scale=1">
 	<title>{{title}}</title>
 	<link rel="stylesheet" href="/static/main2.css">
 	<style id="customStyle">
@@ -12,12 +13,12 @@
 	<script src="/static/stickyfill.js"></script>
 </head>
 
-<body>
+<body mode="{{mode}}" article-name="{{articleName}}">
 
 	<div id="topBar">
 		<div class="leftPane">
 			<!-- <div class="menuIcon"><a href="/"><i class="fa fa-bars"></i></a></div> -->
-			<div class="menuIcon"><a href="/"><i class="fa fa-home"></i></a></div>
+			<div class="menuIcon menuIcon_home"><a href="/"><i class="fa fa-home"></i></a></div>
 			<div class="menuIcon menuIcon_search">
 				<i class="fa fa-search"></i>
 				<div class="search">
@@ -29,7 +30,6 @@
 			</div>
 		</div>
 		<div id="menu" class="midPane">
-			<!-- <div class="menuIcon"><a href="/"><i class="fa fa-user"></i></a></div> -->
 			{{menuHtml}}
 		</div>
 		<div class="menuIcons rightPane">
@@ -39,24 +39,53 @@
 		</div>
 	</div>
 
+	<div id="phoneMenu" active="false">
+		<div id="phoneMenuOpener" onclick="togglePhoneMenu()"><i class="fa fa-bars"></i></div>
+		<div class="menuItem"><a href="/{{db}}">Home</a></div>
+		<div class="menuItem"><a href="/{{db}}/_menu">Site Menu</a></div>
+		<div class="menuItem"><a href="/">Wiki Index</a></div>
+		<div class="menuItem" onclick="toggleTOC(); togglePhoneMenu();">Table of Contents</div>
+		<div class="menuItem" onclick="alert('not on mobile yet, sorry');">Admin Controls</div>
+		<div class="menuItem" onclick="toggleStyle(); togglePhoneMenu();">Toggle Styles</div>
+		<div class="menuItem" onclick="alert('not on mobile yet, sorry');">Login/Logout</div>
+	</div>
+
 	<div id="content">
 		<div id="leftContent">
 			<div id="badge">{{badgeHtml}}</div>
 			<div id="leftTools">
 
 				
-				<div id="toc">
+				<div id="toc" onclick="toggleTOC('closed')">
 					<h1>Contents</h1>
 					{{tocHtml}}
 				</div>
 			</div>
 		</div>
-		<div id="mainContent">{{content}}</div>
+		<div id="mainContent">
+			<div id="mainContent_view">{{content}}</div>
+			<div id="mainContent_edit">
+				<div class="title">Editing article {{articleName}}</div>
+				<div class="editButtons">					
+					<div class="button" onclick="viewMode()">abandon edit</div>
+					<div class="button" onclick="save()">save</div>					
+				</div>
+				<textarea id="editText">{{wikitext}}</textarea>
+			</div>
+			<div id="mainContent_revisions">
+				<div class="title">Revision history for article {{articleName}}</div>
+				<div class="editButtons">
+					<div class="button" onclick="viewMode()">back to view mode</div>
+					<div class="button" onclick="getRevisionHistory()">get revision history</div>
+				</div>
+				<div id="revisionHistory"></div>
+			</div>
+		</div>		
 		<div id="sidebarContent">{{sidebarHtml}}</div>
 
 		<div id="admin">
-			<div><a onclick="alert('sorry, not yet implemented')">edit this page</a></div>
-			<div><a onclick="alert('sorry, not yet implemented')">view edit history</a></div>
+			<div><a onclick="editMode()">edit this page</a></div>
+			<div><a onclick="revisionHistory()">revision history</a></div>
 			<div><a onclick="alert('what were you expecting?')">do other stuff</a></div>
 		</div>
 	</div>
@@ -72,10 +101,144 @@
 	    smoothScroll.init({ offset:60 });
 	</script>
 	<script>
+		var modes = /\/(edit|revisions)$/;
+
+		function editMode() {
+			window.location = window.location.href.replace(modes,'') + '/edit';
+		}
+		function getRevisionHistory() {
+			var response = DAL.get(loc.getApiRoot()+'/revisions');
+			response = JSON.parse(response);
+			var body = response.entries
+				.map(function(e){
+					return [
+						e.rev,
+						new Date(e.client_modified),
+						e.size,
+						e.sharing_info.modified_by
+					].map(function(a){ return '<td>'+a+'</td>' }).join(' ');
+				}).join('</tr><tr>');
+			var template = ''+
+				'<table>' +
+					'<tr>' +
+						'<th>Revision ID</th>'+
+						'<th>Modified Date</th>'+
+						'<th>File Size</th>'+
+						'<th>Modified By</th>'+
+					'</tr>'+
+					'<tr>'+
+						'{~body~}'+
+					'</tr>'+
+				'</table>';
+			var html = template.replace('{~body~}',body);
+			document.getElementById('revisionHistory').innerHTML = html;
+		}
+		function revisionHistory() {
+			window.location = window.location.href.replace(modes,'') + '/revisions';	
+		}
+		function save() {
+			var url = loc.getArticleRoot();
+			var body = document.getElementById('editText').value;
+			var response = DAL.put(url,body);
+			if (response!='success') {
+				console.log(response);
+				alert('error');
+			} else {
+				viewMode();
+			}
+		}
+		function viewMode() {
+			window.location = window.location.href.replace(modes,'');
+		}
+
+		function togglePhoneMenu() {
+			var e = document.getElementById('phoneMenu');
+			var state = e.getAttribute('active');
+			e.setAttribute('active',state=='true'?'false':'true');
+		}
+
 		function toggleStyle() {
 			var s = document.getElementById('customStyle');
 			s.disabled = !s.disabled;
 		}
+
+		function toggleTOC(state) {
+			var e = document.getElementById('leftContent');
+			e.setAttribute('state', state || e.getAttribute('state')=='open'?'closed':'open' );
+		}
+
+		var loc = {
+			getDatabaseRoot: function() {
+				alert('not implemented');
+			},
+			getArticleRoot: function(api) {
+				var dumb = window.location.href+'';
+				var articleRoot = dumb.replace('javascript is fucking retarded','');
+				// debugger;
+				// return null;
+				return articleRoot.replace(modes,'');
+			},
+			getApiRoot: function() {
+				return window.location.origin + '/api' + window.location.pathname.replace(modes,'');
+			}
+		}
+
+		var DAL = {
+			addDefaultHandlers:function(xhr) {
+				xhr.addEventListener('error',this.handleError);
+				xhr.addEventListener('abort',this.handleAbort);
+			},
+			handleError:function(a,b,c) {
+				alert('XHR error');
+			},
+			handleAbort:function(a,b,c) {
+				alert('XHR abort');
+			},
+			get: function(url) {
+				var xhr = new XMLHttpRequest();
+				// this.addDefaultHandlers(xhr);
+				xhr.open('GET',url,false);
+				xhr.send();
+				return xhr.responseText;
+			},
+			put: function(url,body) {
+				var xhr = new XMLHttpRequest();
+				// this.addDefaultHandlers(xhr);
+				xhr.open('PUT',url,false);
+				xhr.send(body);
+				return xhr.responseText;				
+			}
+		}
+	</script>
+	<script>
+		setTimeout(function(){
+			if ('{{mode}}'=='revisions') getRevisionHistory();
+
+			var lis = document.querySelectorAll('#mainContent_view li');
+			for (var i = 0; li = lis[i]; i++) {
+				li.setAttribute('collapse-state','open');
+				if (li.querySelector('ul')) {
+					li.insertBefore(createExpando(),li.firstChild);
+					// li.innerHTML = '<i class="fa fa-plus-square-o expando"></i>' + li.innerHTML;
+					li.querySelector('.expando').addEventListener('click',function(){
+						var p = this.parentNode;
+						var newState = p.getAttribute('collapse-state') == 'open' ? 'closed' : 'open';
+						this.parentNode.setAttribute('collapse-state',newState);
+						if (newState=='open') this.className = 'fa fa-minus-square-o expando';
+						else this.className = 'fa fa-plus-square-o expando';
+					});
+				}
+
+			};
+
+			function createExpando() {
+				var e = document.createElement('i');
+				e.className="fa fa-minus-square-o expando";
+				return e;
+			}
+		},500);
+
+
 	</script>
 
 </body>

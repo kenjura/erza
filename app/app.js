@@ -1,3 +1,4 @@
+var bodyParser = require('body-parser');
 var express = require('express');
 var article = require('./model/Article.js');
 var menu = require('./model/Menu.js');
@@ -7,6 +8,11 @@ var app = express();
 
 app.set('views', './app/views')
 app.set('view engine', 'html');
+
+
+app.use(bodyParser.text());
+app.use(bodyParser.json()); // for parsing application/json
+app.use(bodyParser.urlencoded({ extended: true })); // for parsing application/x-www-form-urlencoded
 
 
 app.get('/', function (req, res) {
@@ -23,30 +29,76 @@ app.get('/search',function(req,res){
 	var q = req.query.q;
 	var db = req.query.db;
 	// console.log(req.query);
-	article.search(q,db,req,res);
+	var menuHtml = article.get(db,'_menu').html;
+	var styleCss = article.getWikitext(db,'_style2');
+	var badgeHtml = article.getWikitext(db,'_badge.html');
+	var html = article.search(q,db,res,function(err,html){
+		if (err) return res.status(200).send('Error with search results.');
+		res.render('index2', { 
+			articleName:'search',
+			title: 'Search Results for "'+q+'"', 
+			db:db, 
+			content: html,
+			wikitext: '',
+			sidebarHtml: '', 
+			menuHtml:menuHtml, 
+			styleCss:styleCss, 
+			tocHtml:'', 
+			badgeHtml:badgeHtml,
+			mode:'view'
+		});
+
+	});
 });
 
-app.get(/\/favicon.ico/, function(req,res){
+app.get(/^\/favicon.ico/, function(req,res){
 	console.log('getting favicon');
 	staticFile.get('favicon.ico',req,res);
 });
 
-app.get(/\/(.*)\/img\/(.*)/, function (req, res) {
+
+app.get(/api\/(.*)\/(.*)\/revisions/,function(req,res){
+	console.log('API Revisions');
+	var revs = article.getRevisions(req.params[0],req.params[1].toLowerCase());
+	res.status(200).send(revs);
+});
+
+app.get(/^\/(.*)\/img\/(.*)/, function (req, res) {
 	console.log('getting image');
 	staticFile.getImage(req.params[0],req.params[1],req,res);
 });
-app.get(/\/(.*)\/(.*)/, function (req, res) {
-	getArticle(req.params[0],req.params[1],req,res);
+app.get(/^\/([^\/]*?)\/([^\/]*)(?:\/(.*))?/, function (req, res) {
+	getArticle(req.params[0],req.params[1],req,res,req.params[2]);
 });
-app.get(/\/(.*)/, function (req, res) {
+// app.get(/^\/(.*)\/edit/, function (req, res) {
+// 	getArticle(req.params[0],'_home',req,res,req.params[2]);
+// });
+// app.get(/^\/(.*)\/(.*)/, function (req, res) {
+// 	getArticle(req.params[0],req.params[1],req,res);
+// });
+app.get(/^\/(.*)/, function (req, res) {
 	getArticle(req.params[0],'_home',req,res);
+});
+
+// API calls
+app.put(/\/(.*)\/(.*)/, function (req, res) {
+	var db = req.params[0];
+	var articleName = req.params[1];
+	var body = req.body;
+	if (!body) return res.status(400).send('no body');
+	article.update(db,articleName,body,function(err,status){
+		if (status!='success') res.status(500).send(err);
+		else res.status(200).send(status);
+	});
 });
 
 // app.get(/\/folder\/(.*)/, function (req, res) {
 // 	getFolder(req.params[0],req,res);
 // });
 
-function getArticle(db,articleName,req,res) {
+function getArticle(db,articleName,req,res,mode) {
+	if (mode===undefined) mode = 'view';
+
 	// get menu
 	var menuHtml = article.get(db,'_menu').html;
 
@@ -64,10 +116,29 @@ function getArticle(db,articleName,req,res) {
 	// badge
 	var badgeHtml = article.getWikitext(db,'_badge.html');
 
+	// debug only
 	// return res.status(200).send(articleObj);
 
+	// revision history, where applicable
+	if (mode=='revisions') {
+		// var revisions = article.getRevisions(db,articleName.toLowerCase());
+		// return res.status(200).send(revisions);	
+	}
+
 	// render
-	res.render('index2', { title: getTitle(db,articleName), db:db, content: articleHtml, sidebarHtml: articleObj.sidebarHtml, menuHtml:menuHtml, styleCss:styleCss, tocHtml:tocHtml, badgeHtml:badgeHtml });
+	res.render('index2', { 
+		articleName:articleName,
+		title: getTitle(db,articleName), 
+		db:db, 
+		content: articleHtml,
+		wikitext: articleObj.wikitext,
+		sidebarHtml: articleObj.sidebarHtml, 
+		menuHtml:menuHtml, 
+		styleCss:styleCss, 
+		tocHtml:tocHtml, 
+		badgeHtml:badgeHtml,
+		mode:mode
+	});
 
 
 	function getTitle(db,articleName) {
@@ -85,7 +156,6 @@ function getFolder(folderName,req,res) {
 	if (!indexHtml) indexHtml = menu.get(folderName);
 	res.render('index', { title: folderName, content: indexHtml, menuHtml:menuHtml });
 }
-
 
 app.listen(3003, function () {
   console.log('Example app listening on port 3003!');

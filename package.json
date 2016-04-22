@@ -12,9 +12,11 @@
     "url": ""
   },
   "dependencies": {
+    "body-parser": "^1.15.0",
     "express": "^4.13.4",
     "fs": "0.0.2",
     "fs-extra": "^0.26.5",
+    "sync-request": "^3.0.0",
     "underscore": "^1.8.3",
     "upath": "^0.1.7"
   },

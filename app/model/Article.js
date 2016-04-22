@@ -1,12 +1,39 @@
 var config = require('../config.js');
 var fs = require('fs');
+var request = require('sync-request');
 var wikiUtil = require('../utils/WikiUtil.js');
 var upath = require('upath');
+var dropbox = {
+	getRevisions:function(path,callback){
+		var	url = 'https://api.dropboxapi.com/2/files/list_revisions';
+		var options = {
+			headers: {
+				'Authorization': 'Bearer ' + config.token,
+  				'Content-Type': 'application/json'
+			},
+			json: {
+				path:path
+			}
+		};
+		var res = request('POST',url,options);
+		console.log('res',res.getBody('utf8'));
+		return res.getBody('utf8');
+	}
+	/*
+	get revision:
+	
+	curl -X POST https://content.dropboxapi.com/2/files/download \
+  --header 'Authorization: Bearer vEY8dPHtxfAAAAAAAAHX1Y5v2n-p78M3ztIsP3QVmS7vCCoEoNA7S3TSddzFiL8c' \
+  --header 'Dropbox-API-Arg: {"path":"/RPG Root/RPG/wiki/system7/7.6.txt","rev":"546152a5000c7fbe"}' 
+  */
+}
 
 exports.get = function(db,name,args){ return get('html',db,name,args) }
 exports.getHtml = function(db,name,args){ return get('html',db,name,args) }
 exports.getWikitext = function(db,name,args){ return get('wikitext',db,name,args) }
+exports.getRevisions = function(db,name,args){ return getRevisions(db,name,args) }
 exports.search = function(q,db,req,res) { return search(q,db,req,res) }
+exports.update = function(db,name,body,callback) { return update(db,name,body,callback) }
 
 function get(which,db,name,args) {
 	console.log('Article.js > get > db=',db,', name=',name,', args=',args, ', which=',which);
@@ -43,8 +70,14 @@ function get(which,db,name,args) {
 	return html;
 }
 
+function getRevisions(db,name,args) {
+	console.log('Article.js > getRevisions');
+	var rootPath = config.dropboxRoot;
+	var path = rootPath + db + '/' + name + '.txt';
+	return dropbox.getRevisions(path);
+}
 
-function search(q,db,req,res) {
+function search(q,db,res,callback) {
 	console.log('Article.js > search > db=',db,', q=',q);
 
 	var root = config.wikiroot + db + '/';
@@ -56,6 +89,7 @@ function search(q,db,req,res) {
 	// similar article name
 	var nameMatches = [], textMatches = [], contents = '';
 	fs.readdir(root, function(err, files) {
+		if (err) return callback(err);
 
 		var re = new RegExp(q,'i');
 
@@ -86,11 +120,20 @@ function search(q,db,req,res) {
 		html = html.replace('{nameMatchesHtml}',nameMatchesHtml);
 		html = html.replace('{textMatchesHtml}',textMatchesHtml);
 
+		console.log('\n\n\n======HTML======');
+		console.log(html);
+
+		return callback(null,html);
+
+
+
 		function foo(match) {
 			return itemTemplate
 				.replace( '{url}' , '/'+db+'/'+match )
 				.replace( '{label}' , match.replace('.txt','') );
 		}
+
+
 
     	// res.status(200).send({ nameMatches:nameMatches, textMatches:textMatches });
 
@@ -106,5 +149,40 @@ function search(q,db,req,res) {
 
 	// else
 	// return res.status(200).send('Unsupported feature. Sorry. :-(');
+
+}
+
+function update(db,name,body,callback) {
+	console.log('Article.js > update > db=',db,', name=',name);
+
+	// trailing '.txt' is not necessary
+	if (name.match('.txt')) name = name.replace('.txt','');
+
+	// no name? if so, home
+	if (!name) name = '_home';
+
+	// home? if so, change path
+	if (name=='home') name = '_home';
+
+	// add extension, if needed
+	var addExt = name.substr(-5)!='.html';
+
+	// find full path
+	var path = config.wikiroot + db + '/' + name + (addExt?'.txt':'');
+	path = upath.normalize(path);
+	console.log(path);
+
+	console.log('AAAH\nAAAH\nAAAH\nAAAH\nAAAH\nAAAH\n');
+	console.log(body);
+
+	// update file
+	fs.writeFile(path,body.toString(),function(err) {
+    	if(err) {
+        	console.log(err);
+        	callback(err,'error');
+        	return;
+    	}
+    	callback(null,'success');
+	}); 
 
 }
