@@ -368,7 +368,7 @@ span.arrow {
 #mainContent .sidebarSection {
 	display: none;
 }
-@media (max-device-width:376px) and (max-device-width:1337px) {
+@media (min-width:376px) and (max-width:1337px) {
 	#sidebarContent {
 		display: none;
 	}
