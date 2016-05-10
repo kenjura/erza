@@ -98,6 +98,8 @@ app.put(/\/(.*)\/(.*)/, function (req, res) {
 
 function getArticle(db,articleName,req,res,mode) {
 	if (mode===undefined) mode = 'view';
+	if (!articleName) articleName = '_home';
+	console.log('getArticle > db=',db,' articleName=',articleName,' mode=',mode);
 
 	// get menu
 	var menuHtml = article.get(db,'_menu').html;

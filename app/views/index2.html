@@ -104,7 +104,7 @@
 		var modes = /\/(edit|revisions)$/;
 
 		function editMode() {
-			window.location = window.location.href.replace(modes,'') + '/edit';
+			window.location = '/{{db}}/{{articleName}}/edit';
 		}
 		function getRevisionHistory() {
 			var response = DAL.get(loc.getApiRoot()+'/revisions');
