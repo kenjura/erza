@@ -82,6 +82,7 @@ app.get(/^\/(.*)/, function (req, res) {
 
 // API calls
 app.put(/\/(.*)\/(.*)/, function (req, res) {
+	console.log('PUT ',req.params[0],req.params[1]);
 	var db = req.params[0];
 	var articleName = req.params[1];
 	var body = req.body;
@@ -108,7 +109,7 @@ function getArticle(db,articleName,req,res,mode) {
 	var styleCss = article.getWikitext(db,'_style2');
 
 	// get article
-	var articleObj = article.get(db,articleName.toLowerCase());
+	var articleObj = article.get(db,articleName);
 	// var articleHtml = '<pre>'+articleObj.html.replace(/</g,'&lt;').replace(/>/g,'&gt;')+'</pre>';
 	var articleHtml = articleObj.html;
 	if (req.query.wikitext!==undefined) articleHtml = '<pre>' + articleObj.wikitext + '</pre>';

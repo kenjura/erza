@@ -10,10 +10,10 @@ exports.get = function(filename,req,res) {
 		return;
 	}
 	console.log('Static.js > get > name=',filename);
-	console.log('DIRNAME',__dirname);
+	// console.log('DIRNAME',__dirname);
 
 	var path = __dirname+'/../static/' + filename;
-	console.log('path',path);
+	// console.log('path',path);
 
 	var extension = filename.substr( filename.lastIndexOf('.')+1 );
 

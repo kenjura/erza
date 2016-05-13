@@ -86,7 +86,8 @@
 		<div id="admin">
 			<div><a onclick="editMode()">edit this page</a></div>
 			<div><a onclick="revisionHistory()">revision history</a></div>
-			<div><a onclick="alert('what were you expecting?')">do other stuff</a></div>
+			<div><a onclick="editMenu()">edit the menu</a></div>
+			<div><a onclick="editStyle()">edit site style</a></div>
 		</div>
 	</div>
 
@@ -105,6 +106,12 @@
 
 		function editMode() {
 			window.location = '/{{db}}/{{articleName}}/edit';
+		}
+		function editMenu() {
+			window.location = '/{{db}}/_menu/edit?return={{articleName}}';
+		}
+		function editStyle() {
+			window.location = '/{{db}}/_style/edit?return={{articleName}}';
 		}
 		function getRevisionHistory() {
 			var response = DAL.get(loc.getApiRoot()+'/revisions');
@@ -148,7 +155,8 @@
 			}
 		}
 		function viewMode() {
-			window.location = window.location.href.replace(modes,'');
+			if (getQueryVariable('return')) window.location.href = '/{{db}}/'+getQueryVariable('return');
+			else window.location.href = loc.getArticleRoot();
 		}
 
 		function togglePhoneMenu() {
@@ -172,11 +180,7 @@
 				alert('not implemented');
 			},
 			getArticleRoot: function(api) {
-				var dumb = window.location.href+'';
-				var articleRoot = dumb.replace('javascript is fucking retarded','');
-				// debugger;
-				// return null;
-				return articleRoot.replace(modes,'');
+				return '/{{db}}/{{articleName}}';
 			},
 			getApiRoot: function() {
 				return window.location.origin + '/api' + window.location.pathname.replace(modes,'');
@@ -208,6 +212,18 @@
 				xhr.send(body);
 				return xhr.responseText;				
 			}
+		}
+
+		function getQueryVariable(variable) {
+		    var query = window.location.search.substring(1);
+		    var vars = query.split('&');
+		    for (var i = 0; i < vars.length; i++) {
+		        var pair = vars[i].split('=');
+		        if (decodeURIComponent(pair[0]) == variable) {
+		            return decodeURIComponent(pair[1]);
+		        }
+		    }
+		    console.log('Query variable %s not found', variable);
 		}
 	</script>
 	<script>

@@ -93,7 +93,7 @@ div.tableContainer table tr:nth-child(odd) { background: rgba(0,0,0,0.05); }
 	width: 300px;
 	background: hsl(40,20%,90%);
     box-shadow: inset -5px 0px 17px -7px rgba(0,0,0,0.5);
-    height: calc(100vh - 40px - 107px);
+    height: calc(100vh - 40px - 136px);
     overflow: auto;
 }
 #sidebarContent {

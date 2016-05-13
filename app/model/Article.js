@@ -45,6 +45,9 @@ function get(which,db,name,args) {
 	// no name? if so, home
 	if (!name) name = '_home';
 
+	// spelled _home wrong?
+	if (name=='Home') name = '_home';
+
 	// home? if so, change path
 	if (name=='home') name = '_home';
 
@@ -54,12 +57,12 @@ function get(which,db,name,args) {
 	// find full path
 	var path = config.wikiroot + db + '/' + name + (addExt?'.txt':'');
 	path = upath.normalize(path);
-	console.log(path);
+	// console.log(path);
 
 	// get file contents
 	try { var filecontents = fs.readFileSync(path); } catch(e) { console.error(e) }
 	if (!filecontents) return 'Article not found.';
-	console.log('article was found. contents=',filecontents);
+	// console.log('article was found. contents=',filecontents);
 
 	// return wikitext, maybe
 	var wikitext = filecontents.toString();
@@ -170,10 +173,6 @@ function update(db,name,body,callback) {
 	// find full path
 	var path = config.wikiroot + db + '/' + name + (addExt?'.txt':'');
 	path = upath.normalize(path);
-	console.log(path);
-
-	console.log('AAAH\nAAAH\nAAAH\nAAAH\nAAAH\nAAAH\n');
-	console.log(body);
 
 	// update file
 	fs.writeFile(path,body.toString(),function(err) {
