@@ -34,6 +34,7 @@
 		</div>
 		<div class="menuIcons rightPane">
 			
+			<div class="menuIcon" onclick="toggleChat()"><i class="fa fa-comment"></i></div>
 			<div class="menuIcon" onclick="toggleStyle()"><i class="fa fa-eye"></i></div>
 			<div class="menuIcon"><i class="fa fa-user"></i></div>
 		</div>
@@ -68,7 +69,8 @@
 				<div class="title">Editing article {{articleName}}</div>
 				<div class="editButtons">					
 					<div class="button" onclick="viewMode()">abandon edit</div>
-					<div class="button" onclick="save()">save</div>					
+					<div class="button" onclick="save(true)">save and continue</div>					
+					<div class="button" onclick="save()">save and view</div>					
 				</div>
 				<textarea id="editText">{{wikitext}}</textarea>
 			</div>
@@ -82,6 +84,11 @@
 			</div>
 		</div>		
 		<div id="sidebarContent">{{sidebarHtml}}</div>
+		<div id="chat" show="false">
+			<h1>Chat</h1>
+			<i class="fa fa-times menuIcon" onclick="document.getElementById('chat').setAttribute('show','false')"></i>
+			<div id="chat-area"></div>
+		</div>
 
 		<div id="admin">
 			<div><a onclick="editMode()">edit this page</a></div>
@@ -92,10 +99,12 @@
 	</div>
 
 	<script>
-	var stickyElements = document.querySelectorAll('#content .sectionOuter h1');
+	if ('{{db}}'=='system7'||'{{db}}'=='dm') {
+		var stickyElements = document.querySelectorAll('#content .sectionOuter h1');
 
-	for (var i = stickyElements.length - 1; i >= 0; i--) {
-	    Stickyfill.add(stickyElements[i]);
+		for (var i = stickyElements.length - 1; i >= 0; i--) {
+		    Stickyfill.add(stickyElements[i]);
+		}
 	}
 	</script>
 	<script>
@@ -143,7 +152,7 @@
 		function revisionHistory() {
 			window.location = window.location.href.replace(modes,'') + '/revisions';	
 		}
-		function save() {
+		function save(keepEditing) {
 			var url = loc.getArticleRoot();
 			var body = document.getElementById('editText').value;
 			var response = DAL.put(url,body);
@@ -151,7 +160,7 @@
 				console.log(response);
 				alert('error');
 			} else {
-				viewMode();
+				if (!keepEditing) viewMode();
 			}
 		}
 		function viewMode() {
@@ -168,6 +177,12 @@
 		function toggleStyle() {
 			var s = document.getElementById('customStyle');
 			s.disabled = !s.disabled;
+		}
+
+		function toggleChat() {
+			var e = document.getElementById('chat');
+			var state = e.getAttribute('show');
+			e.setAttribute('show',state=='true'?'false':'true');
 		}
 
 		function toggleTOC(state) {
@@ -255,6 +270,38 @@
 		},500);
 
 
+	</script>
+
+	<script>
+	function chat(txt) {
+		var template = '<div class="chat-comment">{txt}</div>';
+		document.getElementById('chat-area').innerHTML += template.replace('{txt}',txt);
+		document.getElementById('chat').setAttribute('show','true');
+	}
+	function roll(mod,dice) {
+		if (!dice) dice = '1d20';
+		if (typeof(mod)=='string') mod.replace(/^(\d+d\d+)([+-]\d+)/,function(em,g1,g2){ 
+			dice = g1;
+			mod = parseInt(g2);
+		});
+
+		var numDice = parseInt(dice.split('d')[0]);
+		var dieType = parseInt(dice.split('d')[1]);
+
+		var rolls = [];
+
+		for (var i = 0; i < numDice; i++) {
+			rolls.push( Math.ceil(Math.random()*dieType) );
+		}
+
+		var t0 = rolls.reduce(function(prev,cur){ return prev+cur },0);
+		var t1 = t0 + mod;
+
+		var modStr = (mod<0?mod:'+'+mod);
+		var diceStr = numDice>1 ? rolls.join('+')+'='+t0 : t0;
+
+		chat('Rolled '+dice+modStr+': '+diceStr+modStr+' = '+t1);
+	}
 	</script>
 
 </body>

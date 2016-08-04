@@ -179,6 +179,9 @@ function wikiToHtml(wikitext,articleName,args) {
 		var namespace = [].concat(articleName.match( /([^:]+)(?=:)/g )).pop();
 		if (namespace) var res = processSpecialLink(entireMatch,namespace,articleName,displayName);
 		if (res) return res;
+
+		if (articleName.match(/^(\d+d\d+)([+-]\d+)/)) return '<a onclick="roll(\''+articleName+'\')">'+articleName+'</a>';
+		if (articleName.match(/^[+-]/)) return '<a onclick="roll('+articleName+')">'+articleName+'</a>';
 			
 		// if (isNullOrEmpty(articleName)) return '<a href="#'+anchor+'" onclick="instance.findHeader(\''+anchor+'\')">'+anchor+'</a>';
 		if (!articleName) return '<a data-scroll href="#'+anchor.replace( /\s/g, '_' )+'">'+anchor+'</a>';
@@ -191,8 +194,16 @@ function wikiToHtml(wikitext,articleName,args) {
 		var active = true;
 		
 		// active = _.some(allArticles,function(a){ return a.name==articleName });
+
+		var link = linkbase+articleName+anchor;
+
+		if (articleName.indexOf('/')>-1) {
+			link = '/'+articleName+anchor;
+			displayName = articleName.substr(articleName.indexOf('/')+1);
+			console.log('link=',link);
+		}
 		
-		return '<a class="wikiLink '+(active?'active':'inactive')+'" data-articleName="'+articleName+'" href="'+linkbase+articleName+anchor+'">'+displayName+'</a>';
+		return '<a class="wikiLink '+(active?'active':'inactive')+'" data-articleName="'+articleName+'" href="'+link+'">'+displayName+'</a>';
 	};
 
 	function processNumberedLists(entireMatch) {	

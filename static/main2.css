@@ -295,6 +295,13 @@ span.arrow {
 .grid3 { width: calc(33.33% - 9px); }
 
 
+.hbox {
+	box-sizing: border-box;
+	display: inline-block;
+	margin-right: 10px;
+	vertical-align: top;	
+}
+
 
 
 #toc {
@@ -357,6 +364,11 @@ span.arrow {
 	background: rgba(0,0,0,0.1);
 }
 
+
+
+
+.indent1 { margin-left: 1em; }
+.indent2 { margin-left: 2em; }
 
 
 .right {
@@ -612,3 +624,39 @@ body[mode="revisions"] #mainContent_revisions { display: block; }
 #mainContent_view li .expando {
 	z-index: 1500;
 }
+
+
+
+#chat {
+	display: none;
+
+	position: fixed;
+	right: 0;
+	top: 40px;
+	height: calc(100vh - 40px);
+	width: 300px;
+
+	background-color: rgba(0,0,0,0.5);
+	color: white;
+}
+#chat[show="true"] {
+	display: block;
+}
+#chat .fa-times {
+	position: absolute;
+	top: 0px;
+	right: 0px;
+	font-size: 20px;
+	padding: 20px;
+}
+#chat #chat-area {
+	width: 100%;
+	height: calc(100vh - 80px);
+	overflow: auto;
+}
+.chat-comment {
+    padding: 10px 0 0 0;
+    border-top: 1px solid gray;
+    margin: 10px;
+}
+
