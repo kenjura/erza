@@ -30,11 +30,11 @@ app.get('/search',function(req,res){
 	var db = req.query.db;
 	// console.log(req.query);
 	var menuHtml = article.get(db,'_menu').html;
-	var styleCss = article.getWikitext(db,'_style2');
+	var styleCss = article.getWikitext(db,'_style');
 	var badgeHtml = article.getWikitext(db,'_badge.html');
 	var html = article.search(q,db,res,function(err,html){
 		if (err) return res.status(200).send('Error with search results.');
-		res.render('index2', { 
+		res.render('index', { 
 			articleName:'search',
 			title: 'Search Results for "'+q+'"', 
 			db:db, 
@@ -106,7 +106,7 @@ function getArticle(db,articleName,req,res,mode) {
 	var menuHtml = article.get(db,'_menu').html;
 
 	// get style
-	var styleCss = article.getWikitext(db,'_style2');
+	var styleCss = article.getWikitext(db,'_style');
 
 	// get article
 	var articleObj = article.get(db,articleName);
@@ -129,7 +129,7 @@ function getArticle(db,articleName,req,res,mode) {
 	}
 
 	// render
-	res.render('index2', { 
+	res.render('index', { 
 		articleName:articleName,
 		title: getTitle(db,articleName), 
 		db:db, 

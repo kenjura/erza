@@ -2,20 +2,23 @@
 <html lang="en">
 <head>
 	<meta charset="utf-8">
+	<meta name="viewport" content="initial-scale=1">
 	<title>{{title}}</title>
 	<link rel="stylesheet" href="/static/main.css">
-	<style>
+	<style id="customStyle">
 	{{styleCss}}
 	</style>
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
+	<script src="/static/smoothScroll.js"></script>
 	<script src="/static/stickyfill.js"></script>
 </head>
 
-<body>
+<body mode="{{mode}}" article-name="{{articleName}}">
 
-	<div id="menu">
-		{{menuHtml}}
-		<div class="menuIcons">
+	<div id="topBar">
+		<div class="leftPane">
+			<!-- <div class="menuIcon"><a href="/"><i class="fa fa-bars"></i></a></div> -->
+			<div class="menuIcon menuIcon_home"><a href="/"><i class="fa fa-home"></i></a></div>
 			<div class="menuIcon menuIcon_search">
 				<i class="fa fa-search"></i>
 				<div class="search">
@@ -25,20 +28,279 @@
 					</form>
 				</div>
 			</div>
-			<div class="menuIcon"><a href="/"><i class="fa fa-home"></i></a></div>
+		</div>
+		<div id="menu" class="midPane">
+			{{menuHtml}}
+		</div>
+		<div class="menuIcons rightPane">
+			
+			<div class="menuIcon" onclick="toggleChat()"><i class="fa fa-comment"></i></div>
+			<div class="menuIcon" onclick="toggleStyle()"><i class="fa fa-eye"></i></div>
+			<div class="menuIcon"><i class="fa fa-user"></i></div>
 		</div>
 	</div>
 
+	<div id="phoneMenu" active="false">
+		<div id="phoneMenuOpener" onclick="togglePhoneMenu()"><i class="fa fa-bars"></i></div>
+		<div class="menuItem"><a href="/{{db}}">Home</a></div>
+		<div class="menuItem"><a href="/{{db}}/_menu">Site Menu</a></div>
+		<div class="menuItem"><a href="/">Wiki Index</a></div>
+		<div class="menuItem" onclick="toggleTOC(); togglePhoneMenu();">Table of Contents</div>
+		<div class="menuItem" onclick="alert('not on mobile yet, sorry');">Admin Controls</div>
+		<div class="menuItem" onclick="toggleStyle(); togglePhoneMenu();">Toggle Styles</div>
+		<div class="menuItem" onclick="alert('not on mobile yet, sorry');">Login/Logout</div>
+	</div>
+
 	<div id="content">
-		<div id="mainContent">{{content}}</div>
+		<div id="leftContent">
+			<div id="badge">{{badgeHtml}}</div>
+			<div id="leftTools">
+
+				
+				<div id="toc" onclick="toggleTOC('closed')">
+					<h1>Contents</h1>
+					{{tocHtml}}
+				</div>
+			</div>
+		</div>
+		<div id="mainContent">
+			<div id="mainContent_view">{{content}}</div>
+			<div id="mainContent_edit">
+				<div class="title">Editing article {{articleName}}</div>
+				<div class="editButtons">					
+					<div class="button" onclick="viewMode()">abandon edit</div>
+					<div class="button" onclick="save(true)">save and continue</div>					
+					<div class="button" onclick="save()">save and view</div>					
+				</div>
+				<textarea id="editText">{{wikitext}}</textarea>
+			</div>
+			<div id="mainContent_revisions">
+				<div class="title">Revision history for article {{articleName}}</div>
+				<div class="editButtons">
+					<div class="button" onclick="viewMode()">back to view mode</div>
+					<div class="button" onclick="getRevisionHistory()">get revision history</div>
+				</div>
+				<div id="revisionHistory"></div>
+			</div>
+		</div>		
 		<div id="sidebarContent">{{sidebarHtml}}</div>
+		<div id="chat" show="false">
+			<h1>Chat</h1>
+			<i class="fa fa-times menuIcon" onclick="document.getElementById('chat').setAttribute('show','false')"></i>
+			<div id="chat-area"></div>
+		</div>
+
+		<div id="admin">
+			<div><a onclick="editMode()">edit this page</a></div>
+			<div><a onclick="revisionHistory()">revision history</a></div>
+			<div><a onclick="editMenu()">edit the menu</a></div>
+			<div><a onclick="editStyle()">edit site style</a></div>
+		</div>
 	</div>
 
 	<script>
-	var stickyElements = document.querySelectorAll('#content .sectionOuter h1');
+	if ('{{db}}'=='system7'||'{{db}}'=='dm') {
+		var stickyElements = document.querySelectorAll('#content .sectionOuter h1');
 
-	for (var i = stickyElements.length - 1; i >= 0; i--) {
-	    Stickyfill.add(stickyElements[i]);
+		for (var i = stickyElements.length - 1; i >= 0; i--) {
+		    Stickyfill.add(stickyElements[i]);
+		}
+	}
+	</script>
+	<script>
+	    smoothScroll.init({ offset:60 });
+	</script>
+	<script>
+		var modes = /\/(edit|revisions)$/;
+
+		function editMode() {
+			window.location = '/{{db}}/{{articleName}}/edit';
+		}
+		function editMenu() {
+			window.location = '/{{db}}/_menu/edit?return={{articleName}}';
+		}
+		function editStyle() {
+			window.location = '/{{db}}/_style/edit?return={{articleName}}';
+		}
+		function getRevisionHistory() {
+			var response = DAL.get(loc.getApiRoot()+'/revisions');
+			response = JSON.parse(response);
+			var body = response.entries
+				.map(function(e){
+					return [
+						e.rev,
+						new Date(e.client_modified),
+						e.size,
+						e.sharing_info.modified_by
+					].map(function(a){ return '<td>'+a+'</td>' }).join(' ');
+				}).join('</tr><tr>');
+			var template = ''+
+				'<table>' +
+					'<tr>' +
+						'<th>Revision ID</th>'+
+						'<th>Modified Date</th>'+
+						'<th>File Size</th>'+
+						'<th>Modified By</th>'+
+					'</tr>'+
+					'<tr>'+
+						'{~body~}'+
+					'</tr>'+
+				'</table>';
+			var html = template.replace('{~body~}',body);
+			document.getElementById('revisionHistory').innerHTML = html;
+		}
+		function revisionHistory() {
+			window.location = window.location.href.replace(modes,'') + '/revisions';	
+		}
+		function save(keepEditing) {
+			var url = loc.getArticleRoot();
+			var body = document.getElementById('editText').value;
+			var response = DAL.put(url,body);
+			if (response!='success') {
+				console.log(response);
+				alert('error');
+			} else {
+				if (!keepEditing) viewMode();
+			}
+		}
+		function viewMode() {
+			if (getQueryVariable('return')) window.location.href = '/{{db}}/'+getQueryVariable('return');
+			else window.location.href = loc.getArticleRoot();
+		}
+
+		function togglePhoneMenu() {
+			var e = document.getElementById('phoneMenu');
+			var state = e.getAttribute('active');
+			e.setAttribute('active',state=='true'?'false':'true');
+		}
+
+		function toggleStyle() {
+			var s = document.getElementById('customStyle');
+			s.disabled = !s.disabled;
+		}
+
+		function toggleChat() {
+			var e = document.getElementById('chat');
+			var state = e.getAttribute('show');
+			e.setAttribute('show',state=='true'?'false':'true');
+		}
+
+		function toggleTOC(state) {
+			var e = document.getElementById('leftContent');
+			e.setAttribute('state', state || e.getAttribute('state')=='open'?'closed':'open' );
+		}
+
+		var loc = {
+			getDatabaseRoot: function() {
+				alert('not implemented');
+			},
+			getArticleRoot: function(api) {
+				return '/{{db}}/{{articleName}}';
+			},
+			getApiRoot: function() {
+				return window.location.origin + '/api' + window.location.pathname.replace(modes,'');
+			}
+		}
+
+		var DAL = {
+			addDefaultHandlers:function(xhr) {
+				xhr.addEventListener('error',this.handleError);
+				xhr.addEventListener('abort',this.handleAbort);
+			},
+			handleError:function(a,b,c) {
+				alert('XHR error');
+			},
+			handleAbort:function(a,b,c) {
+				alert('XHR abort');
+			},
+			get: function(url) {
+				var xhr = new XMLHttpRequest();
+				// this.addDefaultHandlers(xhr);
+				xhr.open('GET',url,false);
+				xhr.send();
+				return xhr.responseText;
+			},
+			put: function(url,body) {
+				var xhr = new XMLHttpRequest();
+				// this.addDefaultHandlers(xhr);
+				xhr.open('PUT',url,false);
+				xhr.send(body);
+				return xhr.responseText;				
+			}
+		}
+
+		function getQueryVariable(variable) {
+		    var query = window.location.search.substring(1);
+		    var vars = query.split('&');
+		    for (var i = 0; i < vars.length; i++) {
+		        var pair = vars[i].split('=');
+		        if (decodeURIComponent(pair[0]) == variable) {
+		            return decodeURIComponent(pair[1]);
+		        }
+		    }
+		    console.log('Query variable %s not found', variable);
+		}
+	</script>
+	<script>
+		setTimeout(function(){
+			if ('{{mode}}'=='revisions') getRevisionHistory();
+
+			var lis = document.querySelectorAll('#mainContent_view li');
+			for (var i = 0; li = lis[i]; i++) {
+				li.setAttribute('collapse-state','open');
+				if (li.querySelector('ul')) {
+					li.insertBefore(createExpando(),li.firstChild);
+					// li.innerHTML = '<i class="fa fa-plus-square-o expando"></i>' + li.innerHTML;
+					li.querySelector('.expando').addEventListener('click',function(){
+						var p = this.parentNode;
+						var newState = p.getAttribute('collapse-state') == 'open' ? 'closed' : 'open';
+						this.parentNode.setAttribute('collapse-state',newState);
+						if (newState=='open') this.className = 'fa fa-minus-square-o expando';
+						else this.className = 'fa fa-plus-square-o expando';
+					});
+				}
+
+			};
+
+			function createExpando() {
+				var e = document.createElement('i');
+				e.className="fa fa-minus-square-o expando";
+				return e;
+			}
+		},500);
+
+
+	</script>
+
+	<script>
+	function chat(txt) {
+		var template = '<div class="chat-comment">{txt}</div>';
+		document.getElementById('chat-area').innerHTML += template.replace('{txt}',txt);
+		document.getElementById('chat').setAttribute('show','true');
+	}
+	function roll(mod,dice) {
+		if (!dice) dice = '1d20';
+		if (typeof(mod)=='string') mod.replace(/^(\d+d\d+)([+-]\d+)/,function(em,g1,g2){ 
+			dice = g1;
+			mod = parseInt(g2);
+		});
+
+		var numDice = parseInt(dice.split('d')[0]);
+		var dieType = parseInt(dice.split('d')[1]);
+
+		var rolls = [];
+
+		for (var i = 0; i < numDice; i++) {
+			rolls.push( Math.ceil(Math.random()*dieType) );
+		}
+
+		var t0 = rolls.reduce(function(prev,cur){ return prev+cur },0);
+		var t1 = t0 + mod;
+
+		var modStr = (mod<0?mod:'+'+mod);
+		var diceStr = numDice>1 ? rolls.join('+')+'='+t0 : t0;
+
+		chat('Rolled '+dice+modStr+': '+diceStr+modStr+' = '+t1);
 	}
 	</script>
 

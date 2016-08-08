@@ -12,7 +12,8 @@ for now:
 
 * preview mode while editing articles
 * better feedback for save buttons in edit mode
-* migrate all style2, badge2 etc back to 1
+* DONE - migrate all style2, badge2 etc back to 1
 * edit mode buttons at bottom, better style
 * edit mode navigable with side nav
 * when editing Home (as opposed to _home) the article should save as "_home.txt" but doesn't
+* skins: multiple different HTML choices, each page can use a different one
