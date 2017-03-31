@@ -39,23 +39,23 @@ function go() {
 	});
 
 	// get styles
-	Article.get(sourcedb,'Special:Style',function(err,styletext){
-		if (err) return;
-		fs.writeFileSync(path+'/_style.txt',styletext);
-	});
+	// Article.get(sourcedb,'Special:Style',function(err,styletext){
+	// 	if (err) return;
+	// 	fs.writeFileSync(path+'/_style.txt',styletext);
+	// });
 
 	// get all images
-	var query = connection.query('SELECT * FROM '+sourcedb+'.image');
-	query
-		.on('result',function(row){
-			try { 
-				var imagepath = fs.realpathSync(imageroot+'/'+row.path);
-				var newpath = path+'/img/'+row.name;
-				fs.copySync(imagepath,newpath); 
-			} catch(e) { 
-				console.error('Image error: ',e) 
-			}
-		});
+	// var query = connection.query('SELECT * FROM '+sourcedb+'.image');
+	// query
+	// 	.on('result',function(row){
+	// 		try { 
+	// 			var imagepath = fs.realpathSync(imageroot+'/'+row.path);
+	// 			var newpath = path+'/img/'+row.name;
+	// 			fs.copySync(imagepath,newpath); 
+	// 		} catch(e) { 
+	// 			console.error('Image error: ',e) 
+	// 		}
+	// 	});
 
 	// get all articles
 	var query = connection.query('SELECT DISTINCT(articleName) FROM '+sourcedb+'.revision;');
@@ -97,7 +97,7 @@ var Article = {
 			"SELECT * " +
 			"FROM $db.revision r " +
 			"INNER JOIN $db.version v ON v.name=r.version " +
-			"WHERE articleName='$name' AND draft=0 " +
+			"WHERE articleName='$name' " +
 			"ORDER BY v.rank DESC, r.datetime DESC " +
 			"LIMIT 1";
 		sql = sql.replace(/\$db/g , db);
