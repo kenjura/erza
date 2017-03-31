@@ -1,0 +1,15 @@
+node_modules
+*.sublime-*
+rpmbuild
+*.rpm
+coverage
+npm-debug.log
+
+# OS X
+*.DS_Store
+.AppleDouble
+.LSOverride
+.env
+quad-node-api.sublime-project
+.nvmrc
+
