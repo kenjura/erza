@@ -6,6 +6,7 @@ else cfg = require('/etc/erza.json');
 module.exports = {
 	linkbase: '/article/',
 	wikiroot: cfg.wikiroot,
+	dmwikiroot: cfg.dmwikiroot,
 	token: 'vEY8dPHtxfAAAAAAAAHX1u-A9JUoZ61A8BoJwgd7zxGaWeaJUDFuaaO_RrjcLJSh',
 	dropboxRoot: '/RPG Root/RPG/wiki/'
 }

@@ -18,7 +18,9 @@ app.use(bodyParser.urlencoded({ extended: true })); // for parsing application/x
 app.get('/', function (req, res) {
 	// getArticle('_home',req,res);
 	// res.status(200).send('no wiki selected');
-	staticFile.get('index.html',req,res);
+	// staticFile.get('index.html',req,res);
+	var html = article.getRaw('.','index.html');
+	res.send(html);
 });
 
 app.get(/\/static\/(.*)/, function (req,res) {
@@ -34,16 +36,16 @@ app.get('/search',function(req,res){
 	var badgeHtml = article.getWikitext(db,'_badge.html');
 	var html = article.search(q,db,res,function(err,html){
 		if (err) return res.status(200).send('Error with search results.');
-		res.render('index', { 
+		res.render('index', {
 			articleName:'search',
-			title: 'Search Results for "'+q+'"', 
-			db:db, 
+			title: 'Search Results for "'+q+'"',
+			db:db,
 			content: html,
 			wikitext: '',
-			sidebarHtml: '', 
-			menuHtml:menuHtml, 
-			styleCss:styleCss, 
-			tocHtml:'', 
+			sidebarHtml: '',
+			menuHtml:menuHtml,
+			styleCss:styleCss,
+			tocHtml:'',
 			badgeHtml:badgeHtml,
 			mode:'view'
 		});
@@ -108,10 +110,12 @@ function getArticle(db,articleName,req,res,mode) {
 	// get style
 	var styleCss = article.getWikitext(db,'_style');
 
+	var rawHtml = (articleName||'').substr(-5)=='.html';
+
 	// get article
-	var articleObj = article.get(db,articleName);
+	var articleObj = rawHtml ? article.get(db,articleName) : article.getRaw(db,articleName);
 	// var articleHtml = '<pre>'+articleObj.html.replace(/</g,'&lt;').replace(/>/g,'&gt;')+'</pre>';
-	var articleHtml = articleObj.html;
+	var articleHtml = rawHtml ? articleObj : articleObj.html;
 	if (req.query.wikitext!==undefined) articleHtml = '<pre>' + articleObj.wikitext + '</pre>';
 	var tocHtml = articleObj.tocHtml;
 	// res.status(200).send(JSON.stringify(req.query));
@@ -125,20 +129,20 @@ function getArticle(db,articleName,req,res,mode) {
 	// revision history, where applicable
 	if (mode=='revisions') {
 		// var revisions = article.getRevisions(db,articleName.toLowerCase());
-		// return res.status(200).send(revisions);	
+		// return res.status(200).send(revisions);
 	}
 
 	// render
-	res.render('index', { 
+	res.render('index', {
 		articleName:articleName,
-		title: getTitle(db,articleName), 
-		db:db, 
+		title: getTitle(db,articleName),
+		db:db,
 		content: articleHtml,
 		wikitext: articleObj.wikitext,
-		sidebarHtml: articleObj.sidebarHtml, 
-		menuHtml:menuHtml, 
-		styleCss:styleCss, 
-		tocHtml:tocHtml, 
+		sidebarHtml: articleObj.sidebarHtml,
+		menuHtml:menuHtml,
+		styleCss:styleCss,
+		tocHtml:tocHtml,
 		badgeHtml:badgeHtml,
 		mode:mode
 	});

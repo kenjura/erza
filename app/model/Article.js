@@ -21,15 +21,16 @@ var dropbox = {
 	}
 	/*
 	get revision:
-	
+
 	curl -X POST https://content.dropboxapi.com/2/files/download \
   --header 'Authorization: Bearer vEY8dPHtxfAAAAAAAAHX1Y5v2n-p78M3ztIsP3QVmS7vCCoEoNA7S3TSddzFiL8c' \
-  --header 'Dropbox-API-Arg: {"path":"/RPG Root/RPG/wiki/system7/7.6.txt","rev":"546152a5000c7fbe"}' 
+  --header 'Dropbox-API-Arg: {"path":"/RPG Root/RPG/wiki/system7/7.6.txt","rev":"546152a5000c7fbe"}'
   */
 }
 
 exports.get = function(db,name,args){ return get('html',db,name,args) }
 exports.getHtml = function(db,name,args){ return get('html',db,name,args) }
+exports.getRaw = function(db,name,args){ return get('raw',db,name,args) }
 exports.getWikitext = function(db,name,args){ return get('wikitext',db,name,args) }
 exports.getRevisions = function(db,name,args){ return getRevisions(db,name,args) }
 exports.search = function(q,db,req,res) { return search(q,db,req,res) }
@@ -54,8 +55,13 @@ function get(which,db,name,args) {
 	// add extension, if needed
 	var addExt = name.substr(-5)!='.html';
 
+	// raw html?
+	var rawHtml = name.substr(-5) == '.html';
+	console.log('rawHtml=',rawHtml,' substr=',name.substr(-5));
+
 	// find full path
-	var path = config.wikiroot + db + '/' + name + (addExt?'.txt':'');
+	var wikiroot = db=='dm' ? config.dmwikiroot : config.wikiroot;
+	var path = wikiroot + db + '/' + name + (addExt?'.txt':'');
 	path = upath.normalize(path);
 	// console.log(path);
 
@@ -66,7 +72,7 @@ function get(which,db,name,args) {
 
 	// return wikitext, maybe
 	var wikitext = filecontents.toString();
-	if (which=='wikitext'||args.which=='wikitext') return wikitext;
+	if (which=='wikitext'||args.which=='wikitext'||which=='raw'||rawHtml) return wikitext;
 
 	// convert wikitext to html
 	var html = wikiUtil.wikiToHtml(wikitext,name,{db:db});
@@ -182,6 +188,6 @@ function update(db,name,body,callback) {
         	return;
     	}
     	callback(null,'success');
-	}); 
+	});
 
 }
