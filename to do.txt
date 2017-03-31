@@ -1,0 +1,4 @@
+to do:
+* Images
+** WikiUtil needs to write the img src tag to reference the image on the HDD
+** New endpoint in app.js to handle images (/image/name), treats similarly to static files
