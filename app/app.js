@@ -113,7 +113,7 @@ function getArticle(db,articleName,req,res,mode) {
 	var rawHtml = (articleName||'').substr(-5)=='.html';
 
 	// get article
-	var articleObj = rawHtml ? article.get(db,articleName) : article.getRaw(db,articleName);
+	var articleObj = rawHtml ? article.getRaw(db,articleName) : article.get(db,articleName);
 	// var articleHtml = '<pre>'+articleObj.html.replace(/</g,'&lt;').replace(/>/g,'&gt;')+'</pre>';
 	var articleHtml = rawHtml ? articleObj : articleObj.html;
 	if (req.query.wikitext!==undefined) articleHtml = '<pre>' + articleObj.wikitext + '</pre>';
